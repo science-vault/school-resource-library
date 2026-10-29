@@ -18,6 +18,15 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
+      - name: Install document title readers
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq antiword poppler-utils tesseract-ocr
+      - uses: actions/cache@v4
+        with:
+          path: .title-cache
+          key: assessment-document-names-v1-${{ github.sha }}
+          restore-keys: assessment-document-names-v1-
+      - name: Check document title rules
+        run: python3 scripts/test_document_titles.py
       - name: Check catalogue behaviour
         run: python3 scripts/test-catalog.py
       - name: Build school resource catalogue

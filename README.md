@@ -28,3 +28,7 @@ python3 -m http.server 8000 --directory _site
 Upload using `assessments/Subject/11/School name/Task name/document.docx` (years 1–12), or the legacy `schools/` layout. Nested task folders are supported. Exact duplicates within a subject, year and school are consolidated. Metadata and Office lock files are ignored. PDFs and media previews are hosted with the website. Word and Office originals use repository download links and Microsoft Office previews to keep the published site within hosting limits. Unconfirmed school origins remain labelled **School not confirmed**. A publisher is not treated as a school.
 
 No reuse licence is granted over uploaded school resources by this repository. Each resource retains its original ownership.
+
+## Displayed assessment names
+
+Document headings from Word files and PDFs are used for the displayed name, with first-page OCR for scanned PDFs. Generic instructions, student fields and school headers are excluded. Task numbers, marking-key labels and validation/supporting-information labels distinguish related files. When no reliable heading is found, the filename is cleaned instead. Explicit `.metadata.json` titles take priority. Original filenames, paths and download links are preserved and remain searchable. `title-report.json` records the source of the generated names.

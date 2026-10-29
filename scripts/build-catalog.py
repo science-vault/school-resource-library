@@ -88,11 +88,15 @@ def main():
  p=argparse.ArgumentParser();p.add_argument('--root',default=str(Path(__file__).resolve().parents[1]));p.add_argument('--output',default='_site');args=p.parse_args();root=Path(args.root).resolve();out=root/args.output
  if out.resolve() in [root,root/'schools',root/'assessments',root/'site']:raise ValueError('Use a separate build output directory.')
  catalogue=build(root)
+ import importlib.util
+ spec=importlib.util.spec_from_file_location('document_titles',Path(__file__).with_name('document_titles.py'));titles=importlib.util.module_from_spec(spec);spec.loader.exec_module(titles)
+ title_report=titles.enrich(catalogue,root)
  if out.exists():shutil.rmtree(out)
  shutil.copytree(root/'site',out)
  for item in catalogue['resources']:
   if item['url'].startswith('https:'):continue
   target=out/item['path'];target.parent.mkdir(parents=True,exist_ok=True);shutil.copyfile(root/item['path'],target)
+ (out/'title-report.json').write_text(json.dumps(title_report,indent=2)+'\n')
  (out/'import-report.json').write_text(json.dumps(catalogue['importReport'],indent=2)+'\n')
  (out/'catalog.json').write_text(json.dumps(catalogue,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
  print(f"Built {len(catalogue['resources'])} unique resources from {len(catalogue['schools'])} schools; {len(catalogue['duplicates'])} duplicate copies omitted from listings.")
