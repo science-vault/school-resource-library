@@ -6,6 +6,9 @@ function choose(resource,url,base){
   if(u.username||u.password||!['https:','http:'].includes(u.protocol)||(u.protocol==='http:'&&u.origin!==origin))return {kind:'unsupported'};
   const drive=u.hostname==='drive.google.com'&&/^\/file\/d\/([A-Za-z0-9_-]+)\/(view|preview)$/.exec(u.pathname);
   if(drive)return {kind:'frame',provider:'Google Drive',src:'https://drive.google.com/file/d/'+drive[1]+'/preview'};
+  const raw=u.hostname==='raw.githubusercontent.com'&&u.pathname.startsWith('/science-vault/school-resource-library/main/');
+  const office=String(resource.extension||resource.filename?.split('.').pop()||'').toLowerCase();
+  if(raw&&['doc','docx','ppt','pptx','xls','xlsx'].includes(office))return {kind:'frame',provider:'Microsoft Office',src:'https://view.officeapps.live.com/op/embed.aspx?src='+encodeURIComponent(u.href)};
   // Only embed repository-hosted files. Other services may prohibit embedding.
   if(u.origin!==origin)return {kind:'unsupported'};
   const extension=String(resource.extension||resource.filename?.split('.').pop()||'').toLowerCase();

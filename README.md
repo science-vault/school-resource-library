@@ -1,10 +1,10 @@
 # School Assessment Library
 
-A separate assessment repository and website for school exams, tests, assessment tasks and marking guides, organised by **school → subject → year level → resource type**. Existing Learning Vault files have not been copied or moved.
+A separate assessment repository and website for school exams, tests, assessment tasks and marking guides, organised by **subject → year group → school → assessment**. Existing Learning Vault files have not been copied or moved.
 
 ## Website
 
-The website provides search, school browsing, subject and year filters, resource type filters, file details, download links, and bookmarks saved on each visitor's device. The collection starts empty.
+The website provides search, school browsing, subject and year filters, resource type filters, file details, download links, and bookmarks saved on each visitor's device. The catalogue includes uploaded files under `assessments/` and legacy `schools/` folders.
 
 GitHub Pages is built by `.github/workflows/deploy.yml`. In repository **Settings → Pages**, choose **GitHub Actions** as the source.
 
@@ -25,6 +25,6 @@ python3 scripts/build-catalog.py
 python3 -m http.server 8000 --directory _site
 ```
 
-Only new files explicitly added to `schools/` appear in this website. Unconfirmed school origins remain labelled **School not confirmed**. A publisher is not treated as a school.
+Upload using `assessments/Subject/11/School name/Task name/document.docx` (years 1–12), or the legacy `schools/` layout. Nested task folders are supported. Exact duplicates within a subject, year and school are consolidated. Metadata and Office lock files are ignored. PDFs and media previews are hosted with the website. Word and Office originals use repository download links and Microsoft Office previews to keep the published site within hosting limits. Unconfirmed school origins remain labelled **School not confirmed**. A publisher is not treated as a school.
 
 No reuse licence is granted over uploaded school resources by this repository. Each resource retains its original ownership.
