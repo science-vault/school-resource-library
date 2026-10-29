@@ -1,6 +1,6 @@
-# School Resource Library
+# School Assessment Library
 
-A separate resource repository and website for new uploads, organised by **school → subject → year level → resource type**. Existing Learning Vault files have not been copied or moved.
+A separate assessment repository and website for school exams, tests, assessment tasks and marking guides, organised by **school → subject → year level → resource type**. Existing Learning Vault files have not been copied or moved.
 
 ## Website
 
@@ -8,7 +8,7 @@ The website provides search, school browsing, subject and year filters, resource
 
 GitHub Pages is built by `.github/workflows/deploy.yml`. In repository **Settings → Pages**, choose **GitHub Actions** as the source.
 
-## Add a new resource
+## Add a new assessment
 
 Upload files to the appropriate folder described in [schools/README.md](schools/README.md), or use:
 

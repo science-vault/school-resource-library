@@ -28,7 +28,7 @@ function startSignIn(){
   if(!window.google?.accounts?.id){loginTimer=setTimeout(startSignIn,400);return;}
   google.accounts.id.initialize({client_id:config.clientId,callback:r=>login(r.credential),auto_select:false});
   google.accounts.id.renderButton($('googleSignIn'),{theme:'outline',size:'large'});
-  $('identity').textContent='Sign in to submit resources or review uploads.';
+  $('identity').textContent='Sign in to submit assessments or review uploads.';
 }
 function bytes64(buffer){const a=new Uint8Array(buffer);let s='';for(let i=0;i<a.length;i+=32768)s+=String.fromCharCode(...a.subarray(i,i+32768));return btoa(s);}
 async function transfer(file,id,offset){
