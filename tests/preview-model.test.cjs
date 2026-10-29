@@ -19,3 +19,9 @@ test('unsupported repository Office and active content use the original-file fal
 test('plain text and media select their appropriate viewers',()=>{
  for(const [extension,kind]of [['TXT','text'],['CSV','text'],['MP4','video'],['MP3','audio']])assert.equal(choose({extension},'schools/a/file',base).kind,kind);
 });
+test('uploaded Word files use Office and unrelated repositories stay blocked',()=>{
+ const url='https://raw.githubusercontent.com/science-vault/school-resource-library/main/assessments/Chemistry/11/School/Task%201.docx';
+ const result=choose({extension:'DOCX'},url,base);
+ assert.equal(result.provider,'Microsoft Office');assert.equal(new URL(result.src).searchParams.get('src'),url);
+ assert.equal(choose({extension:'DOCX'},url.replace('/school-resource-library/','/other-repo/'),base).kind,'unsupported');
+});

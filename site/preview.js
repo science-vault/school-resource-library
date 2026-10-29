@@ -21,7 +21,7 @@ function open(resource,url){
   if(mode.kind==='frame'){
     const frame=document.createElement('iframe');frame.title='Preview: '+resource.title;
     frame.referrerPolicy='no-referrer';frame.allow='fullscreen';frame.setAttribute('allowfullscreen','');
-    frame.onload=()=>{if(dialog.open)setStatus(mode.provider==='Google Drive'?'Google Drive preview · Access follows the original sharing settings.':'PDF preview · Use the document toolbar to navigate and zoom.');};
+    frame.onload=()=>{if(dialog.open)setStatus(mode.provider==='Google Drive'?'Google Drive preview · Access follows the original sharing settings.':mode.provider==='Microsoft Office'?'Word / Office preview · Use the document controls to browse pages.':'PDF preview · Use the document toolbar to navigate and zoom.');};
     body.append(frame);setStatus('Loading preview… If it stays blank, use Open original.');frame.src=mode.src;
   }else if(mode.kind==='image'){
     image=document.createElement('img');const current=image;current.alt=resource.title;current.className='preview-image';current.onload=()=>{if(current===image)setStatus('Image preview · Use the zoom controls to inspect details.');};
