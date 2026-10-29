@@ -32,3 +32,9 @@ No reuse licence is granted over uploaded school resources by this repository. E
 ## Displayed assessment names
 
 Displayed names use the exact original filename, including its extension, punctuation, dates and version numbers. Automatic document-heading extraction and OCR renaming are disabled because guessed titles can misidentify assessments. Explicit `.metadata.json` titles take priority when supplied by the owner. Original filenames remain searchable. File paths, downloads, bookmarks and duplicate handling are preserved. Old generated-name caches are ignored. `title-report.json` records the naming policy and sources.
+
+## Document preview tiles
+
+Assessment files open in a grid of real first-page previews by default. PDF, Word, PowerPoint, spreadsheet and image previews are generated during deployment and cached by file content. Images load lazily, with 36 assessments per batch. List view, original filenames, saves, full previews and downloads remain available. Files that cannot be rendered show an Open document option; no invented cover is substituted. `thumbnail-report.json` records any conversion failures.
+
+Mac resource forks (`._*`), `.DS_Store`, `__MACOSX`, Windows directory metadata and temporary Office locks (`~$*`, `-$*`) are excluded from the catalogue and published documents. Saved-webpage support folders (`*_files`) are also excluded from assessment listings. Sidecar JSON configuration is used internally and is never listed as an assessment.

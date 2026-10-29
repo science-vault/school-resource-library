@@ -9,6 +9,17 @@ class CatalogueTests(unittest.TestCase):
    b=root/'schools/another-school/physics/year-12/worksheets';b.mkdir(parents=True);(b/'Duplicate.txt').write_text('Unique worksheet content')
    c=root/'schools/unconfirmed/chemistry/year-11/exams';c.mkdir(parents=True);(c/'New paper.txt').write_text('Different content')
    data=module.build(root);self.assertEqual(len(data['resources']),2);self.assertEqual(len(data['duplicates']),1);self.assertEqual(len(data['schools']),2);first=next(q for q in data['resources'] if q['title']=='Motion and graphs');self.assertEqual(first['school'],'Example School');self.assertEqual(first['yearLevel'],'12');self.assertIn('%26',first['url']);self.assertEqual(next(q for q in data['resources'] if q['filename']=='New paper.txt')['school'],'School not confirmed')
+ def test_metadata_and_temporary_files_are_never_resources(self):
+  with TemporaryDirectory() as temp:
+   root=Path(temp);folder=root/'assessments/Physics/12/Example';folder.mkdir(parents=True)
+   (folder/'real.pdf').write_bytes(b'real assessment')
+   for name in ['._real.pdf','~$real.docx','-$real.doc','.DS_Store','Thumbs.db','desktop.ini','real.pdf.metadata.json']:
+    (folder/name).write_bytes(b'{}')
+   nested=folder/'__MACOSX';nested.mkdir();(nested/'unwanted.pdf').write_bytes(b'junk')
+   web=folder/'Saved page_files';web.mkdir();(web/'profile.jpg').write_bytes(b'web asset')
+   data=module.build(root)
+   self.assertEqual([r['filename'] for r in data['resources']],['real.pdf'])
+   self.assertEqual(data['importReport']['sourceDocuments'],1)
  def test_empty_collection(self):
   with TemporaryDirectory() as temp:self.assertEqual(module.build(temp)['resources'],[])
  def test_invalid_year_fails_clearly(self):

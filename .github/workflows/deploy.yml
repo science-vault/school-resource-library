@@ -18,12 +18,21 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
+      - name: Install preview readers
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq libreoffice-writer libreoffice-calc libreoffice-impress poppler-utils python3-pil fonts-liberation fonts-dejavu-core
+      - uses: actions/cache@v4
+        with:
+          path: .thumbnail-cache
+          key: assessment-previews-v1-${{ github.sha }}
+          restore-keys: assessment-previews-v1-
       - name: Check document title rules
         run: python3 scripts/test_document_titles.py
       - name: Check catalogue behaviour
         run: python3 scripts/test-catalog.py
       - name: Build school resource catalogue
         run: python3 scripts/build-catalog.py
+      - name: Build document preview tiles
+        run: python3 scripts/build_thumbnails.py
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v4
         with:

@@ -3,3 +3,12 @@ __pycache__/
 .openai/
 
 .title-cache/
+
+.thumbnail-cache/
+.DS_Store
+._*
+__MACOSX/
+Thumbs.db
+desktop.ini
+~$*
+-$*

@@ -19,7 +19,7 @@ def year_part(part):
  m=re.fullmatch(r'(?:year[-_ ]?)?([1-9]|10|11|12)',part,re.I)
  return m[1] if m else ''
 def usable(file):
- return file.is_file() and not file.is_symlink() and file.suffix.lower() in EXTENSIONS and not any(p.startswith(('._','~$','-$')) or p.lower() in ['.ds_store','__macosx','thumbs.db','desktop.ini','readme.txt'] for p in file.parts)
+ return file.is_file() and not file.is_symlink() and file.suffix.lower() in EXTENSIONS and not any(p.startswith(('._','~$','-$')) or p.lower().endswith('_files') or p.lower() in ['.ds_store','__macosx','thumbs.db','desktop.ini','readme.txt'] for p in file.parts)
 def digest_file(file):
  h=hashlib.sha256()
  with file.open('rb') as stream:
