@@ -79,6 +79,44 @@ def build(root):
             digest = hashlib.file_digest(stream, 'sha256').hexdigest()
         documents.setdefault(digest, {'source': source, 'rows': []})['rows'].append(row)
 
+    # Convert multiple Office files per LibreOffice session to amortize startup.
+    # Hash-based temporary filenames prevent collisions between school uploads.
+    office_entries = [(digest, doc) for digest, doc in documents.items()
+                      if doc['source'].suffix.lower() in OFFICE
+                      and not (root / '.thumbnail-cache' / (digest + '.jpg')).exists()]
+    batches = [office_entries[i:i + 20] for i in range(0, len(office_entries), 20)]
+
+    def warm_batch(batch):
+        with tempfile.TemporaryDirectory(prefix='assessment-office-batch-') as folder:
+            work = Path(folder)
+            inputs = []
+            for digest, document in batch:
+                path = work / (digest + document['source'].suffix.lower())
+                shutil.copyfile(document['source'], path)
+                inputs.append(str(path))
+            office = shutil.which('soffice') or shutil.which('libreoffice')
+            if not office:
+                return len(batch)
+            try:
+                run([office, '-env:UserInstallation=' + (work / 'profile').as_uri(),
+                     '--headless', '--convert-to', 'pdf', '--outdir', str(work), *inputs], timeout=120)
+            except (RuntimeError, OSError):
+                pass  # Completed PDFs remain usable; unconverted files retry individually.
+            for digest, _ in batch:
+                pdf = work / (digest + '.pdf')
+                if pdf.exists():
+                    try:
+                        thumbnail(pdf, root / '.thumbnail-cache' / (digest + '.jpg'))
+                    except (RuntimeError, OSError, ValueError):
+                        pass
+        return len(batch)
+
+    completed = 0
+    with ThreadPoolExecutor(max_workers=4) as pool:
+        for count in pool.map(warm_batch, batches):
+            completed += count
+            print(f'Office documents checked: {completed}/{len(office_entries)}', flush=True)
+
     def render(entry):
         digest, document = entry
         cached = root / '.thumbnail-cache' / (digest + '.jpg')
