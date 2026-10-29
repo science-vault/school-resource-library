@@ -2,13 +2,14 @@
 from pathlib import Path
 from zipfile import ZipFile,BadZipFile
 from xml.etree import ElementTree as ET
-import re,shutil,subprocess,tempfile,unicodedata
+import re,shutil,subprocess,tempfile,unicodedata,os
 W='{http://schemas.openxmlformats.org/wordprocessingml/2006/main}'
 WORDS={'one':'1','two':'2','three':'3','four':'4','five':'5','six':'6','seven':'7','eight':'8','nine':'9','ten':'10','eleven':'11','twelve':'12'}
 TASK=r'\b(?:assessment\s+)?task\s*[:#.-]?\s*(\d{1,2}|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve)\b'
 
 def run(args,timeout=35):
- result=subprocess.run(args,capture_output=True,timeout=timeout)
+ env=os.environ.copy();env['OMP_THREAD_LIMIT']='1'
+ result=subprocess.run(args,capture_output=True,timeout=min(timeout,8),env=env)
  if result.returncode:raise ValueError('Text extraction unavailable')
  return result.stdout.decode('utf-8',errors='replace')
 def normal(text):
@@ -179,6 +180,6 @@ def enrich(catalogue,root):
  with ThreadPoolExecutor(4) as pool:
   for index,(row,result) in enumerate(pool.map(rename,catalogue['resources']),1):
    row['originalTitle']=row['title'];row.update(result);changed+=row['title']!=row['originalTitle']
-   if index%100==0:print('Document names checked:',index,flush=True)
+   if index%25==0:print('Document names checked:',index,flush=True)
  cache_path.write_text(json.dumps(cache,ensure_ascii=False))
  return {'total':len(catalogue['resources']),'renamed':changed,'sources':dict(Counter(r['titleSource'] for r in catalogue['resources']))}
