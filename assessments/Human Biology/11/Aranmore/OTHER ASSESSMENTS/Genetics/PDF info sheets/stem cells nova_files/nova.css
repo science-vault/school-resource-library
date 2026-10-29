@@ -1,0 +1,31 @@
+body { font-size: 90%; line-height: 120%; font-family: Arial }
+
+li  { font-size: 100%; line-height: 120%; font-family: Arial }
+p  { font-size: 100%; line-height: 120%; font-family: Arial }
+ul { font-size: 100%; line-height: 120%; font-family: Arial }
+ol { font-size: 100%; line-height: 120%; font-family: Arial }
+td { font-size: 90%; line-height: 120%; font-family: Arial }
+
+a:link {color: #333399 }
+a:active {color: #333399 }
+a:visited {color: #666666 }
+
+h1  { font-size: 130%; color: #000000; line-height: 100%; font-weight: bold; font-family: Arial }
+h2 { font-size: 110%; color: #000000; line-height: 100%; font-weight: bold; font-family: Arial }
+h3 { font-size: 90%; color: #000000; line-height: 100%; font-weight: bold; font-family: Arial }
+
+.index   { font-size: 110%; line-height: 120%; font-family: arial }
+.index-small   { font-size: 85%; font-weight: bold; line-height: 120%; font-family: arial }
+.index-small-not-bold   { font-size: 95%; line-height: 120%; font-family: arial }
+
+.smaller { font-size: 75%; line-height: 120%; font-family: Arial }
+.bit-smaller { font-size: 90%; line-height: 150%; font-family: Arial }
+.bigger  { font-size: 110% }
+.biggest  { font-size: 130%; font-weight: bold; }
+
+.key { font-size: 130%; line-height: 120%; font-family: Arial; font-weight: bold }
+.white   { color: white }
+.bold  { font-size: 90%; line-height: 120%; font-family: Arial; font-weight: bold }
+
+.sub, sup { font-size: 90% }
+.sup, sub { font-size: 90% }

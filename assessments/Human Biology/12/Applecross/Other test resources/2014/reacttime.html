@@ -1,0 +1,130 @@
+
+<!-- saved from url=(0058)https://faculty.washington.edu/chudler/java/reacttime.html -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"><title></title>
+
+
+
+<script language="JavaScript">
+
+<!-- This script and many more are available free online at -->
+<!-- The JavaScript Source!! http://javascript.internet.com -->
+
+<!-- Begin
+function rnd() {
+r1=new Date();
+num=Math.round(Math.abs(Math.sin(r1.getTime())*10000000))%5;
+return num;
+}
+function start() {
+if(q==1){return}
+c=0;
+ad=0;
+da=0;
+setTimeout("spel()",1000+1000*rnd());
+document.ful.text8.value="wait...";
+}
+function stop() {
+if(da==1){return}
+if(ad==1){return}
+if(q==1){return}
+if(c==0){fusk()}
+if(c==0){return}
+da=1
+rak();
+}
+function rak() {
+slutTime=new Date();
+sltid=slutTime.getTime();
+tidpo=(sltid-stid)/1000
+if (ad==1)tidpo=2;
+tidtot=tidtot+tidpo;
+as="";if (tidtot<1)as="0"
+document.ful.text6.value="Total time: "
++as+Math.round(tidtot*100)/100+" seconds"
+as="";
+if (tidpo<1) as="0"
+if(ad==0){
+if (k==1)document.ful.text1.value="Reaction time 1: "+as+tidpo+" seconds"
+if (k==2)document.ful.text2.value="Reaction time 2: "+as+tidpo+" seconds"
+if (k==3)document.ful.text3.value="Reaction time 3: "+as+tidpo+" seconds"
+if (k==4)document.ful.text4.value="Reaction time 4: "+as+tidpo+" seconds"
+if (k==5)document.ful.text5.value="Reaction time 5: "+as+tidpo+" seconds"
+document.ful.text8.value="Push Start";
+}
+as="";if (tidtot<1)as="0"
+document.ful.text6.value="Total time: "
++as+Math.round(tidtot*100)/100+" seconds"
+as="";if (tidtot/k<1)as="0"
+document.ful.text7.value="Avg. time: "
++as+Math.round(tidtot*10000/(k*100))/100+" seconds"
+if(k>4){
+q=1
+document.ful.text8.value="Game Over...";
+   }
+}
+function spel() {
+if (ad==1)return
+k=k+1
+c=1;
+startTime=new Date();
+stid=startTime.getTime();
+document.ful.text8.value="PUSH STOP!!!";
+}
+function fusk() {
+document.ful.text8.value="Too soon. 2 sec penalty. Push start!"
+ad=1
+stid=0;
+rak();
+}
+tidtot=0;
+k=0;
+q=0;
+ad=0;
+// End -->
+</script> 
+
+</head><body>
+<center><h2>Test Your Reaction Time</h2></center>
+Instructions: Click on the "Start" Button.  You will see the word
+"wait..." in the window above the button.  When the window says "PUSH
+STOP!!!," click on the "Stop" button.  You will get a 2 second penalty
+if you click on the "Stop" button BEFORE the window says "PUSH
+STOP!!!."<p>
+
+Click on the "New Experiment" button to start 5 new trials.  The times
+will change as you hit the stop button.</p><p>
+
+NOTE:  this test does not work if you are using an Internet EXPLORER
+browser.  All versions of NETSCAPE will work.</p><p>
+
+ </p><center>
+<table cellpadding="20"><tbody><tr><td>
+<form name="ful">
+<input size="30" name="text1" value="Reaction time 1:"><br>
+<input size="30" name="text2" value="Reaction time 2:"><br>
+<input size="30" name="text3" value="Reaction time 3:"><br>
+<input size="30" name="text4" value="Reaction time 4:"><br>
+<input size="30" name="text5" value="Reaction time 5:"><p>
+<input size="30" name="text6" value="Total time: "><br>
+<input size="30" name="text7" value="Avg. time: "></p><p>
+<input size="30" name="text8" value="Push Start"><br>
+<input type="button" value="Start" onclick="start()">
+<input type="button" value="STOP" onclick="stop()"></p><p>
+<input type="button" value="New Experiment" onclick="history.go(0)">
+</p></form></td>
+<td></td>
+<td>
+
+<iframe src="about:blank" style="width: 500px; height: 200px; border: none;"></iframe>
+
+</td></tr></tbody></table>
+
+
+</center>
+
+<p></p><center>
+<a href="https://faculty.washington.edu/chudler/chgames.html">[Back
+to Games]</a></center><p>
+
+
+</p></body></html>
