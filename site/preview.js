@@ -18,7 +18,18 @@ function open(resource,url){
   $('previewFocus').setAttribute('aria-pressed','false');$('previewFocus').textContent='Full screen';
   const mode=SchoolPreviewModel.choose(resource,url,location.href),body=$('previewBody');
   body.dataset.kind=mode.kind;dialog.showModal();
-  if(mode.kind==='frame'){
+  if(mode.kind==='pdf'){
+    abort=new AbortController();const controller=abort;
+    setStatus('Loading PDF from the assessment repository…');
+    (async()=>{try{
+      const response=await fetch(mode.src,{signal:controller.signal});if(!response.ok)throw Error('Unavailable');
+      const bytes=await response.arrayBuffer();if(controller.signal.aborted)return;
+      objectURL=URL.createObjectURL(new Blob([bytes],{type:'application/pdf'}));
+      const frame=document.createElement('iframe');frame.title='Preview: '+resource.title;frame.src=objectURL;
+      frame.onload=()=>{if(!controller.signal.aborted&&dialog.open)setStatus('PDF preview · Use the document toolbar to navigate, zoom and print.');};
+      body.append(frame);
+    }catch{if(!controller.signal.aborted)setStatus('The PDF could not load. Use Open original or Download file to view it.');}})();
+  }else if(mode.kind==='frame'){
     const frame=document.createElement('iframe');frame.title='Preview: '+resource.title;
     frame.referrerPolicy='no-referrer';frame.allow='fullscreen';frame.setAttribute('allowfullscreen','');
     frame.onload=()=>{if(dialog.open)setStatus(mode.provider==='Google Drive'?'Google Drive preview · Access follows the original sharing settings.':mode.provider==='Microsoft Office'?'Word / Office preview · Use the document controls to browse pages.':'PDF preview · Use the document toolbar to navigate and zoom.');};
@@ -58,3 +69,4 @@ $('previewZoomReset').onclick=()=>{zoom=1;scale();};
 dialog.addEventListener('close',()=>{if(document.fullscreenElement===dialog)document.exitFullscreen().catch(()=>{});clean();if(opener?.isConnected&&opener.getClientRects().length)opener.focus();});
 window.SchoolResourcePreview={open};
 })();
+

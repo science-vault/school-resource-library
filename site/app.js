@@ -67,6 +67,7 @@ if(cfg.enabled&&/^https:\/\/script\.google\.com\/macros\/s\/[a-zA-Z0-9_-]+\/exec
 }
 const isDocument=r=>![r.filename||'',...(r.path||'').split('/')].some(p=>/^(?:\._|~\$|-\$)|^(?:\.DS_Store|__MACOSX|Thumbs\.db|desktop\.ini)$|\.metadata\.json$|_files$/i.test(p));
 data={...value,resources:[...value.resources.filter(r=>r.id&&r.title&&typeof r.path==='string'&&(r.path.startsWith('schools/')||r.path.startsWith('assessments/'))&&!r.path.split('/').includes('..')),...cloud].filter(isDocument)};
+const oldSaved=new Set(saved);let migrated=false;for(const r of data.resources){if(Array.isArray(r.legacyIds)&&r.legacyIds.some(id=>oldSaved.has(id))){saved.add(r.id);for(const id of r.legacyIds)saved.delete(id);migrated=true;}}if(migrated)persistSaved();
 for(const r of data.resources){r.yearLevel=r.yearLevel?String(r.yearLevel):'';r.subject=r.subject||'Subject not specified';r.schoolId=r.schoolId||'unconfirmed';r.school=r.school||'School not confirmed';}
 for(const school of data.schools)school.resourceCount=0;
 for(const r of data.resources){let school=data.schools.find(s=>s.id===r.schoolId);if(!school){school={id:r.schoolId,name:r.school,subjects:[],resourceCount:0};data.schools.push(school);}school.resourceCount++;if(!school.subjects.includes(r.subject))school.subjects.push(r.subject);}
@@ -76,3 +77,4 @@ for(const id of ['newSchool','newSubject','newYear','newType'])$(id).addEventLis
 $('folderForm').addEventListener('submit',event=>{event.preventDefault();const path=folderPath();if(!path)return;$('uploadStatus').textContent='Place the files in the folder shown above, then commit the upload on GitHub. The catalogue updates after deployment.';window.open(repo+'/upload/main/'+path.split('/').map(encodeURIComponent).join('/'),'_blank','noopener');});
 document.addEventListener('keydown',event=>{if(event.key==='/'&&!['INPUT','TEXTAREA','SELECT'].includes(document.activeElement.tagName)&&!document.querySelector('dialog[open]')){event.preventDefault();$('search').focus();}});load();
 })();
+

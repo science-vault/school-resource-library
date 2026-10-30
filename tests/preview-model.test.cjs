@@ -25,3 +25,6 @@ test('uploaded Word files use Office and unrelated repositories stay blocked',()
  assert.equal(result.provider,'Microsoft Office');assert.equal(new URL(result.src).searchParams.get('src'),url);
  assert.equal(choose({extension:'DOCX'},url.replace('/school-resource-library/','/other-repo/'),base).kind,'unsupported');
 });
+
+test('repository PDF originals are fetched into the PDF viewer without bundling them',()=>{const url='https://raw.githubusercontent.com/science-vault/school-resource-library/main/assessments/Lowerschool/8/Science/School/Test%201.pdf';assert.deepEqual(choose({extension:'PDF'},url,base),{kind:'pdf',provider:'PDF',src:url});for(const other of [url.replace('/school-resource-library/','/other-repo/'),url.replace('raw.githubusercontent.com','raw.githubusercontent.com.evil.example')])assert.equal(choose({extension:'PDF'},other,base).kind,'unsupported');});
+test('repository image, text and media originals retain preview modes',()=>{for(const [extension,kind]of [['JPG','image'],['CSV','text'],['MP4','video'],['MP3','audio']]){const url='https://raw.githubusercontent.com/science-vault/school-resource-library/main/assessments/file.'+extension.toLowerCase();assert.equal(choose({extension},url,base).kind,kind);}});

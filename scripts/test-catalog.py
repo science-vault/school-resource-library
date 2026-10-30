@@ -42,4 +42,23 @@ class CatalogueTests(unittest.TestCase):
    self.assertEqual(next(v for v in out['resources'] if v['school']=='Primary')['yearLevel'],'1')
    self.assertTrue(all(v['yearLevel']=='11' for v in out['resources'] if v['school']=='Byford'))
    self.assertEqual(next(v for v in out['resources'] if v['filename']=='Unknown school quiz.pdf')['school'],'School not confirmed')
+ def test_lower_school_year_subject_source_and_bookmark_alias(self):
+  with TemporaryDirectory() as temp:
+   root=Path(temp)
+   for location,content in [('Lowerschool/8/Science/Biological Sciences/Narrogin/2018/Task 1.pdf',b'science'),('Lowerschool/8/Maths/Pearson/Chapter 01/Test.docx',b'maths'),('Lowerschool/8/Maths/Another School/Test.docx',b'maths'),('Lowerschool/9/HASS/Unknown source task.pdf',b'hass')]:
+    f=root/'assessments'/location;f.parent.mkdir(parents=True,exist_ok=True);f.write_bytes(content)
+   data=module.build(root);self.assertEqual(len(data['resources']),4)
+   science=next(x for x in data['resources'] if x['filename']=='Task 1.pdf');self.assertEqual((science['subject'],science['yearLevel'],science['school']),('Science','8','Narrogin'));self.assertEqual(science['examYear'],'2018');self.assertEqual(len(science['legacyIds']),1)
+   maths=[x for x in data['resources'] if x['subject']=='Maths'];self.assertEqual({x['school'] for x in maths},{'Pearson','Another School'});self.assertEqual(len({x['id'] for x in maths}),2)
+   hass=next(x for x in data['resources'] if x['subject']=='HASS');self.assertEqual(hass['school'],'School not confirmed');self.assertEqual(hass['yearLevel'],'9')
+   self.assertTrue(all(x['url'].startswith(module.RAW) for x in data['resources']))
+ def test_originals_are_not_copied_into_the_pages_artifact(self):
+  import subprocess,sys
+  with TemporaryDirectory() as temp:
+   root=Path(temp);(root/'site').mkdir();(root/'site/index.html').write_text('<html>Library</html>')
+   f=root/'assessments/Lowerschool/10/Science/Example/Big test.pdf';f.parent.mkdir(parents=True);f.write_bytes(b'%PDF-test'*10000)
+   subprocess.run([sys.executable,str(Path(module.__file__)),'--root',str(root)],check=True,capture_output=True)
+   self.assertTrue((root/'_site/index.html').exists());self.assertFalse((root/'_site/assessments').exists());self.assertEqual(f.stat().st_size,90000)
+   row=json.loads((root/'_site/catalog.json').read_text())['resources'][0];self.assertEqual(row['title'],'Big test.pdf');self.assertTrue(row['url'].startswith(module.RAW))
 if __name__=='__main__':unittest.main()
+

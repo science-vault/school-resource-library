@@ -4,10 +4,11 @@ from pathlib import Path
 import argparse,hashlib,json,re,shutil,unicodedata
 from datetime import datetime,timezone
 from urllib.parse import quote
-EXTENSIONS={'.pdf','.doc','.docx','.ppt','.pptx','.xls','.xlsx','.csv','.txt','.png','.jpg','.jpeg','.webp','.gif','.zip','.mp4','.mp3','.odt','.odp','.rtf','.bmp','.pub'}
+EXTENSIONS={'.pdf','.doc','.docx','.ppt','.pptx','.xls','.xlsx','.csv','.txt','.png','.jpg','.jpeg','.webp','.gif','.zip','.mp4','.mp3','.odt','.odp','.rtf','.bmp','.pub','.pps','.notebook','.pages','.tif','.tiff','.mov','.webm','.wav','.ogg','.tsv'}
 TYPES={'exams':'Exams','exam':'Exams','solutions':'Solutions','marking-guides':'Solutions','assessments':'Assessments','lessons':'Lessons','powerpoints':'PowerPoints','worksheets':'Worksheets','programs':'Programs','other':'Other resources'}
 LOCAL={'.pdf','.png','.jpg','.jpeg','.webp','.gif','.bmp','.txt','.csv','.mp4','.mp3'}
 RAW='https://raw.githubusercontent.com/science-vault/school-resource-library/main/'
+SCIENCE_TOPICS={'biological sciences','chemical sciences','earth and space sciences','investigating sciences','investigating science','physical sciences','biology','chemistry','earth and space','physics','cosmetic science','diet, drugs and nutrition','earth and space science','exam','forensic science','investigating','psychology elective','sport science'}
 def read_json(path):
  if not path.exists():return {}
  value=json.loads(path.read_text(encoding='utf-8'))
@@ -47,7 +48,12 @@ def build(root):
     subject=clean(meta.get('subject'),parts[0]);school='School not confirmed';found=year_part(parts[1])
     if found:
      year=year or found
-     if len(parts)>3 and not re.fullmatch(r'(?:19|20)\d{2}',parts[2]):school=parts[2]
+     lower=re.sub(r'[^a-z]','',parts[0].casefold()) in ['lowerschool','lowersecondary']
+     if lower and len(parts)>=4:
+      subject=clean(meta.get('subject'),parts[2])
+      origin_index=4 if parts[2].casefold()=='science' and parts[3].casefold() in SCIENCE_TOPICS else 3
+      if len(parts)>origin_index+1 and not re.fullmatch(r'(?:19|20)\d{2}',parts[origin_index]):school=parts[origin_index]
+     elif len(parts)>3 and not re.fullmatch(r'(?:19|20)\d{2}',parts[2]):school=parts[2]
     else:
      school=parts[1]
      for part in parts[2:-1]:year=year or year_part(part)
@@ -77,8 +83,14 @@ def build(root):
     if match:exam_year=match[1]
    if exam_year and not re.fullmatch(r'20\d\d|19\d\d',exam_year):raise ValueError(f'Invalid exam year for {file.name}')
    url='/'.join(quote(p,safe='') for p in file.relative_to(root).parts)
-   if modern and file.suffix.lower() not in LOCAL:url=RAW+url
+   url=RAW+url  # Originals stay in the repository; Pages publishes only the catalogue and previews.
    item={'id':hashlib.sha256((digest+'|'+subject+'|'+year+'|'+slug).encode()).hexdigest() if modern else digest,'title':title,'filename':file.name,'schoolId':slug,'school':school,'subject':subject,'yearLevel':year,'type':kind or ('PowerPoints' if file.suffix.lower() in ['.ppt','.pptx'] else 'Other resources'),'examYear':exam_year,'extension':file.suffix[1:].upper(),'size':file.stat().st_size,'path':repository_path,'url':url,'added':clean(meta.get('added')),'description':clean(meta.get('description'))}
+   if modern and found and re.sub(r'[^a-z]','',parts[0].casefold()) in ['lowerschool','lowersecondary']:
+    previous_subject=clean(meta.get('subject'),parts[0]);previous_school=clean(meta.get('school'),parts[2] if len(parts)>3 and not re.fullmatch(r'(?:19|20)\d{2}',parts[2]) else 'School not confirmed')
+    previous_slug=re.sub(r'[^a-z0-9]+','-',unicodedata.normalize('NFKD',previous_school).encode('ascii','ignore').decode().lower()).strip('-') or 'unconfirmed'
+    if previous_school.casefold() in ['school not confirmed','unknown','unconfirmed','unsorted']:previous_slug='unconfirmed'
+    previous_id=hashlib.sha256((digest+'|'+previous_subject+'|'+year+'|'+previous_slug).encode()).hexdigest()
+    if previous_id!=item['id']:item['legacyIds']=[previous_id]
    resources.append(item);seen[identity]=item;schoolrow['resourceCount']+=1;schoolrow['subjects'].add(subject)
  accounted={p for item in resources for p in [item['path'],*item.get('alsoStoredAt',[])]};missing=sorted(set(accepted)-accounted)
  if missing:raise ValueError('Unaccounted uploaded files: '+str(missing))
@@ -101,3 +113,4 @@ def main():
  (out/'catalog.json').write_text(json.dumps(catalogue,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
  print(f"Built {len(catalogue['resources'])} unique resources from {len(catalogue['schools'])} schools; {len(catalogue['duplicates'])} duplicate copies omitted from listings.")
 if __name__=='__main__':main()
+

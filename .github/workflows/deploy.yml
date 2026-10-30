@@ -27,6 +27,8 @@ jobs:
           restore-keys: assessment-previews-v1-
       - name: Check document title rules
         run: python3 scripts/test_document_titles.py
+      - name: Check document preview routing
+        run: node --test tests/preview-model.test.cjs
       - name: Check catalogue behaviour
         run: python3 scripts/test-catalog.py
       - name: Build school resource catalogue
@@ -40,3 +42,4 @@ jobs:
       - name: Deploy website
         id: deployment
         uses: actions/deploy-pages@v4
+

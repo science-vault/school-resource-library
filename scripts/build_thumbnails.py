@@ -9,8 +9,8 @@ import tempfile
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
-OFFICE = {'.doc', '.docx', '.odt', '.rtf', '.ppt', '.pptx', '.odp', '.xls', '.xlsx'}
-IMAGES = {'.jpg', '.jpeg', '.png', '.webp', '.gif', '.bmp'}
+OFFICE = {'.doc', '.docx', '.odt', '.rtf', '.ppt', '.pptx', '.odp', '.xls', '.xlsx', '.pps'}
+IMAGES = {'.jpg', '.jpeg', '.png', '.webp', '.gif', '.bmp', '.tif', '.tiff'}
 
 def run(command, timeout=30):
     env = os.environ.copy()
@@ -148,3 +148,4 @@ def build(root):
 
 if __name__ == '__main__':
     build(Path(__file__).resolve().parents[1])
+

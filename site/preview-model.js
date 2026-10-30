@@ -8,16 +8,17 @@ function choose(resource,url,base){
   if(drive)return {kind:'frame',provider:'Google Drive',src:'https://drive.google.com/file/d/'+drive[1]+'/preview'};
   const raw=u.hostname==='raw.githubusercontent.com'&&u.pathname.startsWith('/science-vault/school-resource-library/main/');
   const office=String(resource.extension||resource.filename?.split('.').pop()||'').toLowerCase();
-  if(raw&&['doc','docx','ppt','pptx','xls','xlsx'].includes(office))return {kind:'frame',provider:'Microsoft Office',src:'https://view.officeapps.live.com/op/embed.aspx?src='+encodeURIComponent(u.href)};
+  if(raw&&['doc','docx','ppt','pptx','pps','xls','xlsx'].includes(office))return {kind:'frame',provider:'Microsoft Office',src:'https://view.officeapps.live.com/op/embed.aspx?src='+encodeURIComponent(u.href)};
   // Only embed repository-hosted files. Other services may prohibit embedding.
-  if(u.origin!==origin)return {kind:'unsupported'};
+  if(u.origin!==origin&&!raw)return {kind:'unsupported'};
   const extension=String(resource.extension||resource.filename?.split('.').pop()||'').toLowerCase();
-  if(extension==='pdf')return {kind:'frame',provider:'PDF',src:u.href};
-  if(['png','jpg','jpeg','webp','gif'].includes(extension))return {kind:'image',src:u.href};
+  if(extension==='pdf')return raw?{kind:'pdf',provider:'PDF',src:u.href}:{kind:'frame',provider:'PDF',src:u.href};
+  if(['png','jpg','jpeg','webp','gif','bmp'].includes(extension))return {kind:'image',src:u.href};
   if(['txt','csv','tsv'].includes(extension))return {kind:'text',src:u.href};
-  if(['mp4','webm'].includes(extension))return {kind:'video',src:u.href};
+  if(['mp4','webm','mov'].includes(extension))return {kind:'video',src:u.href};
   if(['mp3','wav','ogg'].includes(extension))return {kind:'audio',src:u.href};
   return {kind:'unsupported'};
 }
 return {choose};
 });
+
