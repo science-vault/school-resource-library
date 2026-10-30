@@ -1,0 +1,1 @@
+An effective way to get a good range of voltages across the LED is to have a 50 Ohm resistor in series with rheostat and connect the LED in parallel with the 50 Ohm. Changing rheostat resistance gives a good range of voltages across parallel branches of 50 Ohm/ LED.

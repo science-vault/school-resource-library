@@ -1,0 +1,3 @@
+Q that asks for no. of ly in a pc:
+
+1 Mpc to ly is on data sheet. Just need to divide by 10^6. Consider changing Q.
