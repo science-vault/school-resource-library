@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Index subject-first assessments and legacy school folders without moving originals."""
 from pathlib import Path
-import argparse,hashlib,json,re,shutil,unicodedata
+import argparse,hashlib,json,re,shutil,unicodedata,subprocess
 from datetime import datetime,timezone
 from urllib.parse import quote
 EXTENSIONS={'.pdf','.doc','.docx','.ppt','.pptx','.xls','.xlsx','.csv','.txt','.png','.jpg','.jpeg','.webp','.gif','.zip','.mp4','.mp3','.odt','.odp','.rtf','.bmp','.pub','.pps','.notebook','.pages','.tif','.tiff','.mov','.webm','.wav','.ogg','.tsv'}
@@ -28,11 +28,23 @@ def digest_file(file):
  return h.hexdigest()
 def kind_for(file):
  name=re.sub(r'(?<=[a-z])(?=[A-Z])',' ',file.stem).replace('_',' ')
- if re.search(r'\b(?:solutions?|solns?|answers?(?:[ -]*key)?|mk|ans|marking[ -]*(?:key|guide|scheme))\b',name,re.I):return 'Solutions'
+ name=re.sub(r'(?<=[A-Za-z])(?=\d)|(?<=\d)(?=[A-Za-z])',' ',name)
+ answer_name=re.sub(r'\b(?:short|extended|long|written)[ -]*answers?\b','',name,flags=re.I)
+ if re.search(r'\b(?:solutions?|solns?|answers?(?:[ -]*key)?|mk|ans|marking[ -]*(?:key|guide|scheme))\b',answer_name,re.I):return 'Solutions'
  if re.search(r'\bexam(?:ination)?s?\b',name,re.I):return 'Exams'
  if re.search(r'\b(?:tests?|quizzes|quiz)\b',name,re.I):return 'Tests'
  if re.search(r'\b(?:tasks?|assessments?|investigations?|inquir(?:y|ies)|projects?)\b',name,re.I):return 'Assessments'
  return 'PowerPoints' if file.suffix.lower() in ['.ppt','.pptx','.odp'] else 'Other resources'
+def upload_dates(root):
+ """Read upload dates in one history scan, independently of academic exam year."""
+ try:
+  output=subprocess.check_output(['git','-c','core.quotepath=false','log','--diff-filter=A','--format=%x00%aI','--name-only','--','assessments','schools'],cwd=root,stderr=subprocess.DEVNULL,text=True)
+ except (subprocess.CalledProcessError,FileNotFoundError):return {}
+ dates={};current=''
+ for line in output.splitlines():
+  if line.startswith('\x00'):current=line[1:]
+  elif current and line.startswith(('assessments/','schools/')):dates[line]=current
+ return dates
 def build(root):
  root=Path(root).resolve();resources=[];duplicates=[];seen={};schools={};accepted=[]
  for source in [root/'schools',root/'assessments']:
@@ -94,6 +106,9 @@ def build(root):
    resources.append(item);seen[identity]=item;schoolrow['resourceCount']+=1;schoolrow['subjects'].add(subject)
  accounted={p for item in resources for p in [item['path'],*item.get('alsoStoredAt',[])]};missing=sorted(set(accepted)-accounted)
  if missing:raise ValueError('Unaccounted uploaded files: '+str(missing))
+ dates=upload_dates(root)
+ for resource in resources:
+  if not resource['added'] and resource['path'] in dates:resource['added']=dates[resource['path']]
  for value in schools.values():value['subjects']=sorted(value['subjects'])
  return {'version':1,'generatedAt':datetime.now(timezone.utc).isoformat(),'resources':resources,'schools':sorted([s for s in schools.values() if s['resourceCount']],key=lambda s:s['name'].casefold()),'duplicates':duplicates,'importReport':{'sourceDocuments':len(accepted),'indexedRecords':len(resources),'duplicateCopies':len(duplicates),'unaccountedFiles':missing}}
 def main():
