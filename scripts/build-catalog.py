@@ -20,7 +20,7 @@ def year_part(part):
  m=re.fullmatch(r'(?:year[-_ ]?)?([1-9]|10|11|12)',part,re.I)
  return m[1] if m else ''
 def usable(file):
- return file.is_file() and not file.is_symlink() and file.suffix.lower() in EXTENSIONS and not any(p.startswith(('._','~$','-$')) or p.lower().endswith('_files') or p.lower() in ['.ds_store','__macosx','thumbs.db','desktop.ini','readme.txt'] for p in file.parts)
+ return file.is_file() and not file.is_symlink() and file.stat().st_size>0 and file.suffix.lower() in EXTENSIONS and not any(p.startswith(('._','~$','-$')) or p.lower().endswith('_files') or p.lower() in ['.ds_store','__macosx','thumbs.db','desktop.ini','readme.txt'] for p in file.parts)
 def digest_file(file):
  h=hashlib.sha256()
  with file.open('rb') as stream:
@@ -46,11 +46,12 @@ def upload_dates(root):
   elif current and line.startswith(('assessments/','schools/')):dates[line]=current
  return dates
 def build(root):
- root=Path(root).resolve();resources=[];duplicates=[];seen={};schools={};accepted=[]
+ root=Path(root).resolve();resources=[];duplicates=[];seen={};schools={};accepted=[];empty_files=[]
  for source in [root/'schools',root/'assessments']:
   if not source.exists():continue
   files=sorted(source.rglob('*'),key=lambda f:(not f.with_name(f.name+'.metadata.json').exists(),not (source/f.relative_to(source).parts[0]/'_school.json').exists(),f.as_posix()))
   for file in files:
+   if file.is_file() and not file.is_symlink() and file.suffix.lower() in EXTENSIONS and file.stat().st_size==0 and not any(p.startswith(('._','~$','-$')) for p in file.parts):empty_files.append(file.relative_to(root).as_posix())
    if not usable(file):continue
    parts=file.relative_to(source).parts;modern=source.name=='assessments'
    if len(parts)<(3 if modern else 2):continue
@@ -110,7 +111,7 @@ def build(root):
  for resource in resources:
   if not resource['added'] and resource['path'] in dates:resource['added']=dates[resource['path']]
  for value in schools.values():value['subjects']=sorted(value['subjects'])
- return {'version':1,'generatedAt':datetime.now(timezone.utc).isoformat(),'resources':resources,'schools':sorted([s for s in schools.values() if s['resourceCount']],key=lambda s:s['name'].casefold()),'duplicates':duplicates,'importReport':{'sourceDocuments':len(accepted),'indexedRecords':len(resources),'duplicateCopies':len(duplicates),'unaccountedFiles':missing}}
+ return {'version':1,'generatedAt':datetime.now(timezone.utc).isoformat(),'resources':resources,'schools':sorted([s for s in schools.values() if s['resourceCount']],key=lambda s:s['name'].casefold()),'duplicates':duplicates,'importReport':{'sourceDocuments':len(accepted),'indexedRecords':len(resources),'duplicateCopies':len(duplicates),'unaccountedFiles':missing,'ignoredEmptyFiles':empty_files}}
 def main():
  p=argparse.ArgumentParser();p.add_argument('--root',default=str(Path(__file__).resolve().parents[1]));p.add_argument('--output',default='_site');args=p.parse_args();root=Path(args.root).resolve();out=root/args.output
  if out.resolve() in [root,root/'schools',root/'assessments',root/'site']:raise ValueError('Use a separate build output directory.')

@@ -44,3 +44,5 @@ Mac resource forks (`._*`), `.DS_Store`, `__MACOSX`, Windows directory metadata 
 The website groups matching assessment versions, answers, marking keys and supporting resources on one card. Matching is scoped to the original subject, school and year, and checks task, semester, chapter and calendar-year numbers. Ambiguous answers remain independently accessible under **Included files → Unlinked answer files**. All source filenames, URLs and downloads remain available. The deployment writes `association-report.json` with the linked files and matching reasons.
 
 Browse learning area → subject/course → year → pathway/unit → strand → topic, then school, assessment type and file format. Filters only show choices available beneath their selected parents. Search includes files attached to an assessment, and the page supports 20, 40, 60 or 100 packs at a time.
+
+Completely empty uploads are excluded from the catalogue and recorded in `import-report.json`; a new empty file cannot create a misleading answer or resource link.
