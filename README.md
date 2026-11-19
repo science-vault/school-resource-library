@@ -38,3 +38,9 @@ Displayed names use the exact original filename, including its extension, punctu
 Assessment files open in a grid of real first-page previews by default. PDF, Word, PowerPoint, spreadsheet and image previews are generated during deployment and cached by file content. Images load lazily, with 36 assessments per batch. List view, original filenames, saves, full previews and downloads remain available. Files that cannot be rendered show an Open document option; no invented cover is substituted. `thumbnail-report.json` records any conversion failures.
 
 Mac resource forks (`._*`), `.DS_Store`, `__MACOSX`, Windows directory metadata and temporary Office locks (`~$*`, `-$*`) are excluded from the catalogue and published documents. Saved-webpage support folders (`*_files`) are also excluded from assessment listings. Sidecar JSON configuration is used internally and is never listed as an assessment.
+
+## Assessment packs and linked curriculum filters
+
+The website groups matching assessment versions, answers, marking keys and supporting resources on one card. Matching is scoped to the original subject, school and year, and checks task, semester, chapter and calendar-year numbers. Ambiguous answers remain independently accessible under **Included files → Unlinked answer files**. All source filenames, URLs and downloads remain available. The deployment writes `association-report.json` with the linked files and matching reasons.
+
+Browse learning area → subject/course → year → pathway/unit → strand → topic, then school, assessment type and file format. Filters only show choices available beneath their selected parents. Search includes files attached to an assessment, and the page supports 20, 40, 60 or 100 packs at a time.

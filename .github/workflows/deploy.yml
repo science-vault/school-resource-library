@@ -18,6 +18,9 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          fetch-depth: 0
       - name: Install preview readers
         run: sudo apt-get update -qq && sudo apt-get install -y -qq libreoffice-writer libreoffice-calc libreoffice-impress poppler-utils python3-pil fonts-liberation fonts-dejavu-core
       - uses: actions/cache@v4
@@ -31,10 +34,14 @@ jobs:
         run: node --test tests/preview-model.test.cjs
       - name: Check catalogue behaviour
         run: python3 scripts/test-catalog.py
+      - name: Check assessment packs and curriculum filters
+        run: node --test tests/assessment-model.test.cjs
       - name: Build school resource catalogue
         run: python3 scripts/build-catalog.py
       - name: Build document preview tiles
         run: python3 scripts/build_thumbnails.py
+      - name: Audit assessment and answer associations
+        run: node scripts/build-pack-report.cjs
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v4
         with:
