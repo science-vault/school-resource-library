@@ -104,6 +104,7 @@ def build(root):
     if previous_school.casefold() in ['school not confirmed','unknown','unconfirmed','unsorted']:previous_slug='unconfirmed'
     previous_id=hashlib.sha256((digest+'|'+previous_subject+'|'+year+'|'+previous_slug).encode()).hexdigest()
     if previous_id!=item['id']:item['legacyIds']=[previous_id]
+   if meta.get('pairingTitle'):item['pairingTitle']=clean(meta['pairingTitle'])
    resources.append(item);seen[identity]=item;schoolrow['resourceCount']+=1;schoolrow['subjects'].add(subject)
  accounted={p for item in resources for p in [item['path'],*item.get('alsoStoredAt',[])]};missing=sorted(set(accepted)-accounted)
  if missing:raise ValueError('Unaccounted uploaded files: '+str(missing))
